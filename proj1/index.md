@@ -115,3 +115,110 @@ Cubeman is [dabbing](https://en.wikipedia.org/wiki/Dab_(dance)).
 I rotated the arms and legs after their translation, and changed the color of
 the arms to make them more visible. I also scaled the head down in the
 y-direction and translated it vertically slightly.
+
+## Task 4
+Imagine a triangle with coordinates $(x_i, y_i)$ for $0 \le i < 3$. Consider
+some other point $(x, y)$. We wish to find coefficients $\alpha, \beta, \gamma$
+such that $x = \alpha x_0 + \beta x_1 + \gamma x_2$ and $y = \alpha y_0 + \beta
+y_1 + \gamma y_2$. Since there are three unknowns and only two constraints, this
+system is underdetermined. So we add the constraint $\alpha + \beta + \gamma =
+1$ to give us a unique solution.
+
+Notice that $\alpha = 1$ and $\beta, \gamma = 0$ at $(x, y) = (x_0, y_0)$, and
+similarly for the other two vertices. Moreover, we can show that $\alpha, \beta,
+\gamma \ge 0$ exactly for points inside the triangle. So we can interpret these
+coefficients as "weighting" the three vertices, to give us a point somewhere
+inside their triangle. This gives us barycentric coordinates.
+
+![q4a.png](q4a.png) The above illustration shows how barycentric coordinates are
+used to weight the colors from each vertex of the triangle in order to shade its
+interior. The vertices are colored red, blue, and green, and we use the
+barycentric coordinates of each interior point to weight the color of the
+vertices and smoothly interpolate between them.
+
+A rendering of `basic/test7.svg` follows: ![q4b.png](q4b.png)
+
+## Task 5
+When sampling from a texture, we use barycentric coordinates to map each point
+$(x, y)$ within a textured triangle to coordinates $(u, v)$ on a texture image,
+scaled such that `0 <= u < width` and `0 <= v < height`. These may be
+non-integral values, so they do not correspond exactly to pixels in the texture.
+
+The `P_NEAREST` sampling technique rounds `u` and `v` to integers, so they
+correspond to a single pixel from the source texture, which we use as our
+sampled color. The `P_LINEAR` technique interpolates between the four
+surrounding pixels closest to $(u, v)$. Specifically, let $(u_0, v_0)$ represent
+the rounded version of $(u, v)$, rounding down to the nearest integer. Then the
+surrounding pixels used for interpolation are located at $(u_0, v_0), (u_0 + 1,
+v_0), (u_0, v_0 + 1), (u_0 + 1, v_0 + 1)$. Bilinear interpolation first defines
+the constants $s = u - u_0$ and $t = v - v_0$. Then, the interpolated color
+becomes
+```
+color = (
+    (1 - s) * (1 - t) * texture[u0, v0]
+    + s * (1 - t) * texture[u0 + 1, v0]
+    + (1 - s) * t * texture[u0, v0 + 1]
+    + s * t * texture[u0 + 1, v0 + 1]
+)
+```
+So what we are doing here is weighting each of the four surrounding grid points
+quadratically based on the product of the horizonal and vertical distances
+between them and the sample point.
+
+We now compare the nearest and bilinear sampling methods (left and right
+respectively) on a reference image using both 1x and 16x supersampling rates
+(top and bottom respectively):
+
+![q5a.png](q5a.png){width=49%} ![q5c.png](q5c.png){width=49%}
+![q5b.png](q5b.png){width=49%} ![q5d.png](q5d.png){width=49%}
+
+## Part 6
+To prevent aliasing effects, we woud like to sample from a texture with all
+frequencies higher than the sampling frequency removed. To do this, we prepare
+"mipmaps", versions of the texture at progressively lower resolutions (by
+blurring adjacent pixels together). For each sample, we draw our color from the
+appropriate mipmap level, and avoid aliasing artifacts.
+
+In `L_NEAREST` mode, we choose the mipmap level whose maximum frequency is
+nearest to our sampling frequency, and sample our pixel from it. In `L_LINEAR`
+mode, we sample from mipmap levels above and below the sampling frequency, then
+take a weighted average of them to produce the final output.
+
+To determine our sampling frequency, we compute the texture sample points `(u,
+v)` for our test point `(x, y)`, as well as for `(x + 1, y)` and `(x, y + 1)`,
+then look at the differences in the texture sample points. We take the maximum
+length of the two texture position offset vectors to determine the lowest sample
+frequency, and then choose the mipmap whose resolution is closest to that.
+
+Level sampling has the lowest performance overhead, since in `L_NEAREST` mode it
+just affects which mipmap we choose to use as a source for our sample. Even in
+`L_LINEAR` mode, we only need to make two samples, from the mipmaps above and
+below our target frequency, and then weight them together with a single lerp.
+However, it requires additional memory to store all the mipmaps to be used for
+sampling
+
+Pixel sampling has a higher computation overhead, since we need to sample from
+four pixels and then perform three lerps to weight them together. But it does
+not require any additional memory to store textures / buffer output. It also
+provides better anti-aliasing / blur when our sampling frequency is higher than
+the source resolution of the texture, since the pixel boundaries are blurred
+together (as shown above).
+
+Finally, supersampling has the greatest antialiasing power, but has the highest
+memory and runtime overhead. This is because we need to repeat all our
+computation once for each subsampled pixel, as well as store an output buffer
+`sample_rate` times larger than the actual frame buffer, so there is both a
+runtime and memory penalty. The advantage is that we get anti-aliasing not just
+for textures, but also for the edges of polygons.
+
+We compare `L_ZERO` and `L_NEAREST` level sampling (top vs bottom) as well as
+`P_NEAREST` and `P_LINEAR` pixel sampling (left vs right) in the below grid.
+
+![q6a.png](q6a.png){width=49%} ![q6c.png](q6c.png){width=49%}
+![q6b.png](q6b.png){width=49%} ![q6d.png](q6d.png){width=49%}
+
+We see that with `L_NEAREST` level sampling, there is a discontinuity as we
+switch mipmap levels, where the "blurriness" of the image increases between
+triangles. We also see that with `P_LINEAR`, the image is also generally more
+"blurry" and individual pixels in the backing texture are less visible, since
+they are interpolated together.
