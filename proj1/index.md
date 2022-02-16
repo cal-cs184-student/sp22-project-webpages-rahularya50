@@ -222,3 +222,5 @@ switch mipmap levels, where the "blurriness" of the image increases between
 triangles. We also see that with `P_LINEAR`, the image is also generally more
 "blurry" and individual pixels in the backing texture are less visible, since
 they are interpolated together.
+
+Website link: [https://cal-cs184-student.github.io/sp22-project-webpages-rahularya50/proj1/](https://cal-cs184-student.github.io/sp22-project-webpages-rahularya50/proj1/).
