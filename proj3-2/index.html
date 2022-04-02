@@ -1,7 +1,37 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 3-2 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="../pandoc.css" type="text/css" />
+</head>
+<body>
+<h1 id="project-3-2">Project 3-2</h1>
+<p>In this project, I implemented BSDFs for reflective, refracting, and microfaceted materials. I completed the first two tasks. Below is a bunny I rendered!</p>
+<div class="figure">
+<img src="mega-bunny.png" alt="mega-bunny.png" style="width:99.0%" />
+<p class="caption">mega-bunny.png</p>
+</div>
+<h2 id="part-1">Part 1</h2>
+<p>The following images show the <code>CBSpheres</code> environment rendered with 0, 1, 2, 3, 4, 5, and 100 ray bounces, using 64 samples per pixel, 4 samples per light, and adaptive sampling.</p>
+<!-- Yes, it says bunny, sorry -->
+<p><img src="bunny-ray-0.png" alt="bunny-ray-0.png" style="width:49.0%" /> <img src="bunny-ray-1.png" alt="bunny-ray-1.png" style="width:49.0%" /> <img src="bunny-ray-2.png" alt="bunny-ray-2.png" style="width:49.0%" /> <img src="bunny-ray-3.png" alt="bunny-ray-3.png" style="width:49.0%" /> <img src="bunny-ray-4.png" alt="bunny-ray-4.png" style="width:49.0%" /> <img src="bunny-ray-5.png" alt="bunny-ray-5.png" style="width:49.0%" /> <img src="bunny-ray-100.png" alt="bunny-ray-100.png" style="width:49.0%" /></p>
+<p>The zero-bounce rendering shows just the surface light. The one-bounce rendering shows the walls directly illuminated by the light, as well as a reflection of the light in both spheres. Note that the refractive sphere has a weaker reflection, due to the Fresnel equations splitting incident light into reflected and refracted portions.</p>
+<p>With two bounces, the reflective sphere is now reflecting its environment (since rays hit the sphere, the environment, and then the room light). The refractive sphere is not yet refracting (since refraction has two ray bounces to both enter and leave the sphere, whereas reflection has just one), but we can see the partial reflection of the environment on its surface.</p>
+<p>With three bounces, the refractive sphere is now refracting light, since rays enter it, leave it, hit the environment, and finally reach the room light. With four bounces, the refractive sphere also refracts <em>in it's reflection</em> in the reflective sphere, and casts some refracted light onto the room wall.</p>
+<p>Very little change is visible with 5, and then 100 bounces. The only difference visible (to me) is the shadow of the refractive sphere, which acquires a slight tint, likely from rays being refracted, bouncing off the floor, the walls, and finally reaching the room light.</p>
+<h2 id="part-2">Part 2</h2>
+<p>The following renders show <code>CBdragon_microfacet_au</code> rendered with alpha set to 0.005, 0.05, 0.25, and 0.5, using 128 samples per pixel and one sample per light, with 5 ray bounces.</p>
+<p><img src="dragon-0.005.png" alt="dragon-0.005.png" style="width:49.0%" /> <img src="dragon-0.05.png" alt="dragon-0.05.png" style="width:49.0%" /> <img src="dragon-0.25.png" alt="dragon-0.25.png" style="width:49.0%" /> <img src="dragon-0.5.png" alt="dragon-0.5.png" style="width:49.0%" /></p>
+<p>We see that as alpha increases, the dragon looks more &quot;rough&quot; and less &quot;shiny&quot;. It also gets less noisy - the white spots are due to an extremely small pdf causing a high radiance, which is more likely to occur with a small alpha.</p>
+<p>Below are two renders of <code>CBbunny_microfacet_cu</code>, rendered with cosine sampling (on the left) and importance sampling (on the right):</p>
+<p><img src="cosine-bunny.png" alt="cosine-bunny.png" style="width:49.0%" /> <img src="importance-bunny.png" alt="importance-bunny.png" style="width:49.0%" /></p>
+<p>We see that the render with importance sampling has fewer white spots and is a lot less noisy in general. This is because, with cosine sampling, most of our samples are those with no reflected light, so they do not contribute to illumination. Whereas with importance sampling, we are focusing on the incident light directions that contribute to illumination, so the variance of the surface illumination is reduced (though in expectation both techniques should work).</p>
+<p>Finally, below is a render of the microfaceted dragon with the chromium material: <img src="dragon-chromium.png" alt="dragon-chromium.png" style="width:999.0%" /></p>
+<p>Since chromium is a relatively grey element, the eta and k parameters do not vary greatly with the frequency of the incident light.</p>
+<p>Website link: <a href="https://cal-cs184-student.github.io/sp22-project-webpages-rahularya50/proj3-2/" class="uri">https://cal-cs184-student.github.io/sp22-project-webpages-rahularya50/proj3-2/</a>.</p>
+</body>
 </html>
