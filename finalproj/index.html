@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="../pandoc.css" type="text/css" />
+</head>
+<body>
+<h1 id="progressive-photon-mapping">Progressive Photon Mapping</h1>
+<p>We will implement progressive photon mapping as described in <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>, and then experiment with other techniques for building and querying photon maps (possibly ML/neural-network based).</p>
+<h2 id="problem-description">Problem Description</h2>
+<p>The project 3 path tracer is inefficient, especially at rendering caustics. To improve this, we will implement photon mapping. Moreover, photon mapping on caustic surfaces tends to have a biased result, which we will need to factor into our approach.</p>
+<h2 id="goals-and-deliverables">Goals and Deliverables</h2>
+<p>We will produce images similar to those from project 3, but with caustics rendered using a small number of iterations. For example, we may render a refractive sphere concentrating rays from an area light onto a small region on the floor, that can be much more efficiently rendered using photon mapping compared to ray tracing. Our implementation will use CUDA-based path tracing, and will be &quot;clean-slate&quot;, though we may reuse some input/output handling code from the 184/284 skeleton.</p>
+<p>As metrics for success, we will compare the number of samples needed, as well as overall compute time, in order to achieve a (qualitatively) similar visual effect or to achieve convergence of the output image below some noise level.</p>
+<p>If time allows, we will experiment with alternative ways of representing a photon map using fewer samples, such as by using them to train a simple ML model to predict subsequent measurements. We will compare these results with the standard techniques in terms of the number of rays needed for noise to drop below a given threshold, the overall amount of computation needed, and the visual accuracy.</p>
+<h2 id="schedule">Schedule</h2>
+<ul>
+<li>Week 1: Implement the basic photon mapping algorithm</li>
+<li>Week 2: Implement the the progressive photon algorithm</li>
+<li>Week 3: Implement a novel photon mapping algorithm with deep learning.</li>
+<li>Week 4: Analysis, Paper, and Presentation.</li>
+</ul>
+<h2 id="resources">Resources</h2>
+<p>In addition to <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, we will use GPU compute resources from NERSC and potentially the RISELab that we have access to.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>T. Hachisuka, S. Ogaki, and H. W. Jensen. 2008. Progressive photon mapping. In ACM SIGGRAPH Asia 2008 papers (SIGGRAPH Asia '08). Association for Computing Machinery, New York, NY, USA, Article 130, 1–8. DOI:https://doi.org/10.1145/1457515.1409083<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>T. Hachisuka, S. Ogaki, and H. W. Jensen. 2008. Progressive photon mapping. In ACM SIGGRAPH Asia 2008 papers (SIGGRAPH Asia '08). Association for Computing Machinery, New York, NY, USA, Article 130, 1–8. DOI:https://doi.org/10.1145/1457515.1409083<a href="#fnref2">↩</a></p></li>
+</ol>
+</div>
+</body>
+</html>
