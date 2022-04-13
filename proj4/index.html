@@ -1,7 +1,62 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 4 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="../pandoc.css" type="text/css" />
+</head>
+<body>
+<h1 id="project-4">Project 4</h1>
+<p>In this project, I implemented cloth simulation by modelling a cloth as a grid of point masses linked by springs. My simulation included interaction with other objects in the environment as well as self-collision. Finally, I also wrote various shader programs to render the cloth as a solid object.</p>
+<h2 id="part-1">Part 1</h2>
+<p>Below is the wireframe of the cloth with all constraints enforced:</p>
+<div class="figure">
+<img src="pinnedfullwireframe.png" />
+
+</div>
+<p>Below, from left-to-right, are the wireframes with only the shearing constraint, and with all but the shearing constraint (open in new tab for clearest experience):</p>
+<p><img src="wireframenoshearing.png" alt="wireframenoshearing.png" style="width:49.0%" /> <img src="wireframeonlyshearing.png" alt="wireframeonlyshearing.png" style="width:49.0%" /></p>
+<p>The shearing constraint connects diagonally-opposing nodes in the mesh, while the other constraints connect those in the same row/column only.</p>
+<h2 id="part-2">Part 2</h2>
+<p>Here is the cloth with default parameters and normal shading after it settles: <img src="defaultpinned4.png" /></p>
+<p>Reducing the spring constant makes the cloth more &quot;elastic&quot;, so it sags lower when it settles, rather than staying up near the center. The opposite is true when increasing the spring constant.</p>
+<p>Increasing the density has the same effect as reducing the spring constrant (since what matters is the ratio of force-to-mass). On the left is an example with a low density and high spring constant, and on the right is an example with a high density and low spring constant.</p>
+<p><img src="lowdensity2pinned.png" style="width:49.0%" /> <img src="highdensity2pinned.png" style="width:49.0%" /></p>
+<p>Reducing the damping causes the cloth to not &quot;settle&quot; after it falls, making it instead bounce back up and down for several cycles until it stops (assuming the damping is not zero). Below we see the cloth bouncing back after falling in an underdamped setting, in the <code>pinned4</code> environment:</p>
+<div class="figure">
+<img src="underdampedbounce.png" />
+
+</div>
+<h2 id="part-3">Part 3</h2>
+<p>The three images below show the cloth resting on the sphere with <code>ks = 500</code>, <code>ks = 5000</code>, and <code>ks = 50000</code> respectively:</p>
+<p><img src="500sphere.png" style="width:32.0%" /> <img src="5000sphere.png" style="width:33.0%" /> <img src="50000sphere.png" style="width:33.0%" /></p>
+<p>Observe how as the spring constant increases, the cloth has less of a tendency to &quot;stretch&quot; below the sphere itself, and instead holds more of its shape rather than hanging straight down.</p>
+<p>We also see the cloth lying on a flat plane, with a texture applied to make the contrast clearer:</p>
+<div class="figure">
+<img src="clothplane.png" />
+
+</div>
+<h1 id="part-4">Part 4</h1>
+<p>The three images below show the progression of the cloth collapsing with default parameters: <img src="clothfold1.png" style="width:32.0%" /> <img src="clothfold2.png" style="width:33.0%" /> <img src="clothfold3.png" style="width:33.0%" /></p>
+<p>When we increase the spring constant (or, equivalently, reduce the density) the folds appear to become larger/looser, since the cloth cannot fold as tightly (see left image). The reverse is true when we reduce the spring constant / increase the density, as shown on the right, where the folds become smaller and more numerous.</p>
+<p><img src="largekfold.png" style="width:49.0%" /> <img src="smallkfold.png" style="width:49.0%" /></p>
+<h2 id="part-5">Part 5</h2>
+<p>A vertex shader takes in parameters from the simulation and determines the final position of the displayed vertices, while passing information to the fragment shader. The fragment shader takes in inputs from the vertex shader and determines the color of the vertex to be rendered.</p>
+<p>Blinn-Phong is made up of three components: an ambient component that uniformly illuminates the surface regardless of orientation, a diffuse component that illuminates the surface based on the angle of the camera with respect to the surface normal independent of the camera's position, and a specular component that illuminates highlights based on the position of the camera as well as the incident light, with the direction of perfect reflection yieldigin the maximum reflectance.</p>
+<p>The three screenshots below show the ambient, diffuse, and specular components respectively, of a sphere:</p>
+<p><img src="ambientphong.png" style="width:32.0%" /> <img src="diffusephong.png" style="width:33.0%" /> <img src="specularphong.png" style="width:33.0%" /></p>
+<p>The full shading with all three components is shown below: <img src="allphong.png" /></p>
+<p>The cloth shaded using a custom image of a cat is shown below: <img src="cattexturecloth.png" /></p>
+<p>The cloth shaded using the same custom image via bump mapping (on the left) and displacement mapping (on the right) as below:</p>
+<p><img src="bumpcatcloth.png" style="width:49.0%" /> <img src="displacementcatcloth.png" style="width:49.0%" /></p>
+<p>Displacement mapping causes distortion of the cloth and sphere surfaces, not just a change in the color. When zoomed in, it is more obvious that the cloth is deformed slightly based on the texture.</p>
+<p>The coarse (on the left) and fine (on the right) applications of this custom texture to the sphere are shown below, with the height and normal parameters held constant, for both bump mapping (at the top) and displacement mapping (on the bottom):</p>
+<p><img src="bumpcoarse.png" style="width:49.0%" /> <img src="bumpfine.png" style="width:49.0%" /> <img src="displacementcoarse.png" style="width:49.0%" /> <img src="displacementfine.png" style="width:49.0%" /></p>
+<p>Observe that while the bump mapping appears unchanged, the displacement mapping appears to have more facets. A consequence is that the actual pattern on the surface becomes less clear, since the changing displacement causes the bump coloration to be less clear.</p>
+<p>Finally, the mirror texture is illustrated below on both the sphere and the cloth:</p>
+<p><img src="mirrorsphere.png" style="width:49.0%" /> <img src="mirrorcloth.png" style="width:49.0%" /></p>
+</body>
 </html>
